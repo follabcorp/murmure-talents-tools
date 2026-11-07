@@ -1,0 +1,4 @@
+disallowed-types = [
+  { path = "std::sync::Mutex", reason = "Use async ownership instead of blocking locks in Relay crates" },
+  { path = "std::sync::RwLock", reason = "Use async ownership instead of blocking locks in Relay crates" },
+]

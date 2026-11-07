@@ -1,0 +1,24 @@
+[package]
+name = "murmure-talents-kit"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+publish = false
+
+[lints.clippy]
+await_holding_lock = "deny"
+await_holding_refcell_ref = "deny"
+disallowed_types = "deny"
+
+[features]
+# The manifests the tests of the rules share (`fixtures`), for the crates that test their own rules on them.
+test-support = []
+
+[dependencies]
+base64 = "0.22"
+ed25519-dalek = "2.1"
+serde_json = "1"
+sha2 = "0.10"
+strict-json = { path = "../strict-json" }
+unicode-segmentation = "=1.12.0"
+url = "2"

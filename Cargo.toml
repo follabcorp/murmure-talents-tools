@@ -1,0 +1,10 @@
+[workspace]
+members = [
+    "crates/murmure-talents",
+    "crates/murmure-talents-kit",
+    "crates/strict-json",
+]
+resolver = "2"
+
+[profile.dev.package.sha2]
+opt-level = 3

@@ -1,0 +1,35 @@
+{
+  "connector": "chrome",
+  "manifest": {
+    "id": "naviguer-sur-le-web",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Naviguer sur le web",
+        "summary": "Explore le web et cherche des informations pour toi."
+      },
+      "en": {
+        "name": "Browse the web",
+        "summary": "Explore websites and find information for you."
+      }
+    },
+    "needs": [
+      "organizing",
+      "learning"
+    ],
+    "capabilities": [
+      "browse-web",
+      "web-search"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

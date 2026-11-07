@@ -1,0 +1,34 @@
+{
+  "connector": "calendrier",
+  "manifest": {
+    "id": "mon-calendrier",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mon calendrier",
+        "summary": "Consulte et organise tes rendez-vous."
+      },
+      "en": {
+        "name": "My calendar",
+        "summary": "View and organize your events."
+      }
+    },
+    "needs": [
+      "calendar"
+    ],
+    "capabilities": [
+      "read-calendar",
+      "edit-calendar"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "connector": "mail",
+  "manifest": {
+    "id": "mes-mails",
+    "version": "1.1.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mes mails",
+        "summary": "Lis tes mails et prépare tes réponses."
+      },
+      "en": {
+        "name": "My email",
+        "summary": "Read your email and prepare replies."
+      }
+    },
+    "needs": [
+      "mail"
+    ],
+    "capabilities": [
+      "read-mail",
+      "send-mail",
+      "organize-mail"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

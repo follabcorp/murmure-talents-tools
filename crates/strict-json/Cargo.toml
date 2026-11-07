@@ -1,0 +1,15 @@
+[package]
+name = "strict-json"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+publish = false
+
+[lints.clippy]
+await_holding_lock = "deny"
+await_holding_refcell_ref = "deny"
+disallowed_types = "deny"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

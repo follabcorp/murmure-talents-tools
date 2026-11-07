@@ -1,0 +1,34 @@
+{
+  "connector": "rappels",
+  "manifest": {
+    "id": "mes-rappels",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mes rappels",
+        "summary": "Retrouve et organise tes rappels."
+      },
+      "en": {
+        "name": "My reminders",
+        "summary": "Find and organize your reminders."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-reminders",
+      "edit-reminders"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,32 @@
+[package]
+name = "murmure-talents"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+publish = false
+
+[lints.clippy]
+await_holding_lock = "deny"
+await_holding_refcell_ref = "deny"
+disallowed_types = "deny"
+
+[[bin]]
+name = "murmure-talents"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", default-features = false, features = ["std", "help", "usage", "error-context"] }
+base64 = "0.22"
+ed25519-dalek = "2.1"
+murmure-talents-kit = { path = "../murmure-talents-kit" }
+serde_json = "1"
+sha2 = "0.10"
+strict-json = { path = "../strict-json" }
+unicode-normalization = "0.1"
+url = "2"
+
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1", default-features = false, features = ["std", "fs"] }
+
+[dev-dependencies]
+tempfile = "3"
