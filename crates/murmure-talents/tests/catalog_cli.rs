@@ -4,25 +4,18 @@
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
-use std::process::{Command, Output};
 
 use base64::{engine::general_purpose::STANDARD, Engine};
 use ed25519_dalek::SigningKey;
 use murmure_talents_kit::TalentIndexVerification;
 
-const SKILL: &str = "---\nname: travel-coach\ndescription: Plan a trip.\n---\nSuggest a local itinerary.\n";
+mod support;
+use support::{tool, path, SKILL};
+
 const MANIFEST: &str = r#"{"id":"travel-coach","version":"1.2.0","kind":"textOnly",
 "localized":{"fr":{"name":"Préparer un voyage","summary":"Prépare un itinéraire."},"en":{"name":"Plan a trip","summary":"Prepare an itinerary."}},
 "needs":["travel"],"capabilities":["browse-web"],"requires":["naviguer-sur-le-web"],
 "minimumMurmureVersion":"1.0.0","author":{"name":"Test Maintainer","github":["test-author"]},"license":"MIT"}"#;
-
-fn tool(arguments: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_murmure-talents")).args(arguments).output().expect("the tool runs")
-}
-
-fn path(path: &Path) -> &str {
-    path.to_str().expect("a UTF-8 path")
-}
 
 /// `<temp>/murmure-talents` holds the Catalogue; `<temp>` is outside it.
 fn populate(temp: &Path) -> std::path::PathBuf {
@@ -91,46 +84,4 @@ fn sign_refuses_a_key_alias_resolving_inside_the_repository_and_writes_no_signat
     assert!(!output.join("index.json.sig").exists());
     let shown = [result.stdout, result.stderr].concat();
     assert!(!String::from_utf8_lossy(&shown).contains(&STANDARD.encode(secret)));
-}
-
-/// A Catalogue root holding one Talent `travel-coach` at `version`, with the given capabilities and Skill text.
-fn catalog_at(root: &Path, version: &str, capabilities: &str, requires: &str, skill: &str) {
-    let talent = root.join("talents/travel-coach");
-    fs::create_dir_all(&talent).unwrap();
-    let manifest = MANIFEST
-        .replace(r#""version":"1.2.0""#, &format!(r#""version":"{version}""#))
-        .replace(r#""capabilities":["browse-web"]"#, &format!(r#""capabilities":{capabilities}"#))
-        .replace(r#""requires":["naviguer-sur-le-web"]"#, &format!(r#""requires":{requires}"#))
-        .replace(r#""author":{"name":"Test Maintainer"}"#, r#""author":{"name":"Test Maintainer","github":["test-author"]}"#);
-    fs::write(talent.join("talent.json"), manifest).unwrap();
-    fs::write(talent.join("SKILL.md"), skill).unwrap();
-}
-
-#[test]
-fn diff_refuses_a_changed_file_without_a_version_raise() {
-    let temp = tempfile::tempdir().unwrap();
-    let (base, head) = (temp.path().join("base"), temp.path().join("head"));
-    catalog_at(&base, "1.2.0", "[]", "[]", SKILL);
-    catalog_at(&head, "1.2.0", "[]", "[]", &SKILL.replace("local", "global"));
-    let result = tool(&["diff", path(&base), path(&head)]);
-    assert_ne!(result.status.code(), Some(0));
-    let text = String::from_utf8_lossy(&result.stdout);
-    assert!(text.contains("ERREUR [travel-coach]"), "{text}");
-}
-
-#[test]
-fn diff_json_lists_an_added_capability_on_a_correct_version_raise() {
-    let temp = tempfile::tempdir().unwrap();
-    let (base, head) = (temp.path().join("base"), temp.path().join("head"));
-    catalog_at(&base, "1.2.0", "[]", "[]", SKILL);
-    catalog_at(&head, "1.3.0", r#"["read-mail"]"#, "[]", SKILL);
-    let result = tool(&["diff", path(&base), path(&head), "--json"]);
-    assert_eq!(result.status.code(), Some(0));
-    let report: serde_json::Value = serde_json::from_slice(&result.stdout).expect("JSON on stdout");
-    assert_eq!(report["valid"], true);
-    assert_eq!(report["errors"], serde_json::json!([]));
-    assert_eq!(report["talents"][0]["talentId"], "travel-coach");
-    assert_eq!(report["talents"][0]["change"], "modified");
-    assert_eq!(report["talents"][0]["addedCapabilities"], serde_json::json!(["read-mail"]));
-    assert_eq!(report["talents"][0]["addedDependencies"], serde_json::json!([]));
 }

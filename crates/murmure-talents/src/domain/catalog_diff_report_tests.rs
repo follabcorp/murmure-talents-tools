@@ -34,3 +34,13 @@ fn a_head_manifest_that_cannot_be_read_is_an_error_and_a_base_one_is_ignored() {
     assert!(!report.is_valid());
     assert!(report.text().contains("ERREUR [trip]"));
 }
+
+#[test]
+fn a_changed_file_at_an_equal_version_makes_the_report_invalid_and_names_the_talent() {
+    let base = [source("trip", json!({}))];
+    let mut changed = source("trip", json!({}));
+    changed.files[0].data = b"another text".to_vec();
+    let report = CatalogDiffReport::build(&base, &[changed]);
+    assert!(!report.is_valid());
+    assert!(report.text().contains("ERREUR [trip]"));
+}

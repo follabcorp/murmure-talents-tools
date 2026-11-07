@@ -10,19 +10,13 @@ use std::process::{Command, Output};
 use base64::{engine::general_purpose::STANDARD, Engine};
 use murmure_talents_kit::TalentCatalogTrust;
 
-const SKILL: &str = "---\nname: travel-coach\ndescription: Plan a trip.\n---\nSuggest a local itinerary.\n";
+mod support;
+use support::{tool, path as text, SKILL};
+
 const MANIFEST: &str = r#"{"id":"travel-coach","version":"1.2.0","kind":"textOnly",
 "localized":{"fr":{"name":"Préparer un voyage","summary":"Prépare un itinéraire."},"en":{"name":"Plan a trip","summary":"Prepare an itinerary."}},
 "needs":["travel"],"capabilities":[],"requires":[],
 "minimumMurmureVersion":"1.0.0","author":{"name":"Test Maintainer","github":["test-author"]},"license":"MIT"}"#;
-
-fn tool(arguments: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_murmure-talents")).args(arguments).output().expect("the tool runs")
-}
-
-fn text(path: &Path) -> &str {
-    path.to_str().expect("a UTF-8 path")
-}
 
 fn stderr(output: &Output) -> String {
     String::from_utf8_lossy(&output.stderr).into_owned()

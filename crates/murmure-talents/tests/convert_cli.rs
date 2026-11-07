@@ -3,15 +3,9 @@
 
 use std::fs;
 use std::path::Path;
-use std::process::{Command, Output};
 
-fn tool(arguments: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_murmure-talents")).args(arguments).output().expect("the tool runs")
-}
-
-fn path(path: &Path) -> &str {
-    path.to_str().expect("a UTF-8 path")
-}
+mod support;
+use support::{tool, path};
 
 #[test]
 fn converts_a_source_to_a_folder_that_validate_refuses_until_the_french_is_filled() {
