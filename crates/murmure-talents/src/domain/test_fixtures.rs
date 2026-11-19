@@ -50,3 +50,20 @@ pub fn validate(talent: CatalogSource, companions: Vec<CatalogSource>, built_in:
     let all: Vec<CatalogSource> = std::iter::once(talent).chain(companions).collect();
     CatalogValidationRule::validate(&all, built_in)
 }
+
+/// An Agent Talent whose folder is `travel-coach` (one `SKILL.md`, so one Skill named `travel-coach`).
+pub fn agent_talent(skills: &[&str], connectors: &[&str]) -> CatalogSource {
+    let agent = json!({
+        "localized": {
+            "fr": {"name": "Voyageur", "role": "Prépare des itinéraires.", "personality": "Chaleureux."},
+            "en": {"name": "Traveler", "role": "Plans itineraries.", "personality": "Warm."}
+        },
+        "skills": skills, "connectors": connectors, "brain": "fast"
+    });
+    default_talent(json!({"kind": "agent", "agent": agent}))
+}
+
+pub fn validate_connectors(talent: CatalogSource, known: &[&str]) -> ValidationReport {
+    let known: Vec<String> = known.iter().map(|id| (*id).to_owned()).collect();
+    CatalogValidationRule::validate_with_connectors(&[talent], &[], &known)
+}

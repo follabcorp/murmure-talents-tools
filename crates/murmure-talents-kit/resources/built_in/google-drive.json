@@ -1,0 +1,35 @@
+{
+  "connector": "google-drive",
+  "manifest": {
+    "id": "google-drive",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Google Drive",
+        "summary": "Lis et complète tes documents et feuilles Google Drive."
+      },
+      "en": {
+        "name": "Google Drive",
+        "summary": "Read and update your Google Drive documents and sheets."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-files",
+      "edit-files"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

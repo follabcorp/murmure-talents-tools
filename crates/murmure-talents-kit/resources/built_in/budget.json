@@ -1,0 +1,34 @@
+{
+  "connector": "budget",
+  "manifest": {
+    "id": "budget",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mon budget",
+        "summary": "Décris et compare tes comptes et tes dépenses dans Actual Budget, sans conseil financier ni devise supposée."
+      },
+      "en": {
+        "name": "My budget",
+        "summary": "Describe and compare your accounts and spending in Actual Budget, with no financial advice or assumed currency."
+      }
+    },
+    "needs": [
+      "paperwork"
+    ],
+    "capabilities": [
+      "read-finances"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

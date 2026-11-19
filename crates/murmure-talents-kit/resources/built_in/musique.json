@@ -1,0 +1,33 @@
+{
+  "connector": "music",
+  "manifest": {
+    "id": "musique",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Musique",
+        "summary": "Lance ta musique et gère tes playlists dans l'app Musique de ton Mac."
+      },
+      "en": {
+        "name": "Music",
+        "summary": "Play your music and manage your playlists in the Music app on your Mac."
+      }
+    },
+    "needs": [
+      "home"
+    ],
+    "capabilities": [
+      "control-media"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

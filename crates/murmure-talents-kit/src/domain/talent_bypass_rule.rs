@@ -69,6 +69,7 @@ impl TalentBypassRule {
         apps.iter()
             .find(|app| {
                 targets.iter().any(|target| names_app(app, target))
+                    || opens_url_scheme(&lower, &app.connector_id)
                     || app
                         .database_paths
                         .iter()
@@ -76,6 +77,28 @@ impl TalentBypassRule {
             })
             .map(TalentBypassRefusal::for_app)
     }
+}
+
+/// The apps that are driven by a URL scheme too: `things:///add?title=x` writes a task, `bear://x-callback-url/trash?id=x` trashes a note,
+/// without going through the Talent.
+/// The scheme, followed by `:` and immediately by a non-blank character (`things:///add`, `things:/add`, `things:add`),
+/// must begin a word. Not it: `ranger les things`, `ls ~/Documents/things`, `mythings:x`, and plain text where the colon
+/// ends the sentence (`things: buy milk`, `things:` followed by a blank, a closing quote or the end of the command).
+const URL_SCHEMES: [(&str, &str); 2] = [("things", "things:"), ("bear", "bear:")];
+
+fn opens_url_scheme(lower: &str, connector_id: &str) -> bool {
+    URL_SCHEMES
+        .iter()
+        .filter(|(connector, _)| *connector == connector_id)
+        .any(|(_, scheme)| {
+            lower
+                .match_indices(scheme)
+                .any(|(at, _)| {
+                    let begins_word = !lower[..at].chars().next_back().is_some_and(is_word);
+                    let followed_by = lower[at + scheme.len()..].chars().next();
+                    begins_word && followed_by.is_some_and(|c| !c.is_whitespace() && c != '"' && c != '\'')
+                })
+        })
 }
 
 fn names_app(app: &CoveredApp, target: &str) -> bool {

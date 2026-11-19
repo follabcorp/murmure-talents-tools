@@ -1,0 +1,34 @@
+{
+  "connector": "bear",
+  "manifest": {
+    "id": "bear",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Bear",
+        "summary": "Cherche, lis et écris tes notes Bear sur ton Mac."
+      },
+      "en": {
+        "name": "Bear",
+        "summary": "Search, read and write your Bear notes on your Mac."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-notes",
+      "edit-notes"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

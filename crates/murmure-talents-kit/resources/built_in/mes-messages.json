@@ -1,0 +1,33 @@
+{
+  "connector": "messages",
+  "manifest": {
+    "id": "mes-messages",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mes messages",
+        "summary": "Résume tes conversations récentes et retrouve un message dans l'app Messages de ton Mac."
+      },
+      "en": {
+        "name": "My messages",
+        "summary": "Summarize your recent conversations and find a message in the Messages app on your Mac."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-messages"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

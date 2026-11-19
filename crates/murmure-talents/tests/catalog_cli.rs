@@ -85,3 +85,25 @@ fn sign_refuses_a_key_alias_resolving_inside_the_repository_and_writes_no_signat
     let shown = [result.stdout, result.stderr].concat();
     assert!(!String::from_utf8_lossy(&shown).contains(&STANDARD.encode(secret)));
 }
+
+#[test]
+fn validates_a_catalog_holding_a_valid_agent_talent() {
+    let temp = tempfile::tempdir().unwrap();
+    let repository = temp.path().join("murmure-talents");
+    let talent = repository.join("talents/travel-coach");
+    fs::create_dir_all(&talent).unwrap();
+    let manifest = MANIFEST
+        .replace(r#""kind":"textOnly""#, r#""kind":"agent""#)
+        .replace(r#""capabilities":["browse-web"],"requires":["naviguer-sur-le-web"],"#, r#""capabilities":[],"#)
+        .replace(
+            r#""license":"MIT"}"#,
+            r#""license":"MIT","agent":{"localized":{"fr":{"name":"Voyageur","role":"Prépare des itinéraires.","personality":"Chaleureux."},
+"en":{"name":"Traveler","role":"Plans itineraries.","personality":"Warm."}},
+"skills":["travel-coach"],"connectors":["calendrier"],"brain":"fast"}}"#,
+        );
+    fs::write(talent.join("talent.json"), manifest).unwrap();
+    fs::write(talent.join("SKILL.md"), SKILL).unwrap();
+    fs::write(repository.join("featured.json"), "[]").unwrap();
+    fs::write(repository.join("revoked.json"), "[]").unwrap();
+    assert_eq!(tool(&["validate", path(&repository)]).status.code(), Some(0));
+}

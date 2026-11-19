@@ -1,0 +1,35 @@
+{
+  "connector": "asana",
+  "manifest": {
+    "id": "asana",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Asana",
+        "summary": "Consulte et fais avancer tes tâches Asana : projets, sections, commentaires."
+      },
+      "en": {
+        "name": "Asana",
+        "summary": "See and move forward your Asana tasks: projects, sections, comments."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-tasks",
+      "edit-tasks"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

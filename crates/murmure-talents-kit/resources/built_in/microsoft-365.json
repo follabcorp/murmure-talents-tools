@@ -1,0 +1,39 @@
+{
+  "connector": "microsoft-365",
+  "manifest": {
+    "id": "microsoft-365",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Microsoft 365",
+        "summary": "Lis, cherche et range ton courrier Outlook et gère ton agenda Microsoft 365."
+      },
+      "en": {
+        "name": "Microsoft 365",
+        "summary": "Read, search and sort your Outlook mail and manage your Microsoft 365 calendar."
+      }
+    },
+    "needs": [
+      "mail",
+      "calendar"
+    ],
+    "capabilities": [
+      "read-mail",
+      "send-mail",
+      "organize-mail",
+      "read-calendar",
+      "edit-calendar"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

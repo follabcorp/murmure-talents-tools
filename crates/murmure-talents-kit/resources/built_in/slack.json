@@ -1,0 +1,35 @@
+{
+  "connector": "slack",
+  "manifest": {
+    "id": "slack",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Slack",
+        "summary": "Lis les messages récents de tes canaux Slack, cherche dans tes conversations et envoie un message en texte ou une réaction."
+      },
+      "en": {
+        "name": "Slack",
+        "summary": "Read the recent messages of your Slack channels, search your conversations and send a text message or a reaction."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-messages",
+      "send-messages"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

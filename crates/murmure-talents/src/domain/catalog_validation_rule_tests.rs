@@ -1,8 +1,8 @@
 use murmure_talents_kit::{TalentExportProjection, TalentManifestRule, TalentSource};
 use serde_json::json;
 
-use super::test_fixtures::{default_talent, embedded, file, manifest, skill, talent, validate};
-use super::{DiagnosticKind, FileKind};
+use super::test_fixtures::{agent_talent, validate_connectors, default_talent, embedded, file, manifest, skill, talent, validate};
+use super::{CatalogSource, DiagnosticKind, FileKind};
 
 fn refused(source: super::CatalogSource) -> bool {
     !validate(source, vec![], &[]).is_valid()
@@ -203,4 +203,82 @@ fn refuses_a_manifest_still_holding_the_translation_placeholder() {
         "en": {"name": "Plan a trip", "summary": "Prepare an itinerary."}
     }});
     assert!(refused(default_talent(placeholder)));
+}
+
+#[test]
+fn accepts_a_talent_declared_by_capability_when_a_built_in_talent_with_code_supplies_it() {
+    let source = default_talent(json!({"capabilities": ["send-mail"]}));
+    assert!(validate(source, vec![], &[embedded("mail-service", "send-mail")]).is_valid());
+}
+
+#[test]
+fn refuses_a_talent_declared_by_capability_when_no_talent_with_code_supplies_it() {
+    let source = default_talent(json!({"capabilities": ["send-mail", "read-mail"]}));
+    let report = validate(source, vec![], &[embedded("mail-service", "send-mail")]);
+    assert!(!report.is_valid());
+    assert!(
+        report.errors.iter().any(|error| error.message == "Aucun Talent avec code ne fournit : read-mail."),
+        "{:?}",
+        report.errors
+    );
+}
+
+#[test]
+fn a_supplier_of_send_mail_avoids_the_mail_warning_of_a_talent_declared_by_capability() {
+    let text = b"Draft and send an email to the recipient.\n";
+    let source = talent("travel-coach", json!({"capabilities": ["send-mail"]}), vec![file("SKILL.md", text)]);
+    let report = validate(source, vec![], &[embedded("mail-service", "send-mail")]);
+    assert!(report.is_valid());
+    assert!(!report.warnings.iter().any(|warning| warning.kind == DiagnosticKind::MailSendingWithoutCapability));
+}
+
+#[test]
+fn accepts_an_agent_talent_whose_connectors_are_known_and_skills_present() {
+    let report = validate_connectors(agent_talent(&["travel-coach"], &["calendrier"]), &["calendrier", "mes-mails"]);
+    assert!(report.is_valid(), "{:?}", report.errors);
+}
+
+#[test]
+fn refuses_an_agent_talent_requesting_an_unknown_connector_and_names_it() {
+    let report = validate_connectors(agent_talent(&["travel-coach"], &["inconnu-connecteur"]), &["calendrier"]);
+    assert!(!report.is_valid());
+    assert!(report.errors.iter().any(|error| error.message.contains("inconnu-connecteur")), "{:?}", report.errors);
+}
+
+#[test]
+fn refuses_an_agent_talent_including_a_skill_absent_from_its_files() {
+    let report = validate_connectors(agent_talent(&["missing-skill"], &["calendrier"]), &["calendrier"]);
+    assert!(report.errors.iter().any(|error| error.message.contains("missing-skill")), "{:?}", report.errors);
+}
+
+#[test]
+fn a_secret_in_an_agent_personality_is_reported_with_a_single_period() {
+    let key = format!("sk-ant-api03-{}", "a1B2".repeat(8));
+    let source = agent_talent(&["travel-coach"], &["calendrier"]);
+    let manifest = String::from_utf8(source.manifest_json.clone()).unwrap().replace("Warm.", &key);
+    let source = CatalogSource { manifest_json: manifest.into_bytes(), ..source };
+    let report = validate_connectors(source, &["calendrier"]);
+    assert!(!report.is_valid());
+    assert!(
+        report.errors.iter().any(|error| error.message.ends_with("Secret détecté dans agent.localized.personality.")
+            && !error.message.contains("..")),
+        "{:?}",
+        report.errors
+    );
+}
+
+#[test]
+fn an_autonomy_field_in_an_agent_talent_is_reported_with_a_single_period() {
+    let source = agent_talent(&["travel-coach"], &["calendrier"]);
+    let mut manifest: serde_json::Value = serde_json::from_slice(&source.manifest_json).unwrap();
+    manifest["agent"]["autonomous"] = json!(true);
+    let source = CatalogSource { manifest_json: serde_json::to_vec(&manifest).unwrap(), ..source };
+    let report = validate_connectors(source, &["calendrier"]);
+    assert!(!report.is_valid());
+    assert!(
+        report.errors.iter().any(|error| error.message.ends_with("« Agir sans demander ».")
+            && !error.message.contains("..")),
+        "{:?}",
+        report.errors
+    );
 }

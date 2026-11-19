@@ -16,6 +16,8 @@ pub enum TalentSource {
 pub enum TalentKind {
     TextOnly,
     WithCode,
+    /// An Agent Talent: no code, carries an `agent` object (ADR-0030, decision 8).
+    Agent,
 }
 
 /// The platform of the Relay.
@@ -70,6 +72,35 @@ pub struct TalentManifest {
     pub author: TalentAuthor,
     pub license: String,
     pub origin: Option<TalentOrigin>,
+    /// Present exactly when `kind` is `Agent`.
+    pub agent: Option<TalentAgent>,
+}
+
+/// The advised type of Brain of an Agent Talent (closed list).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TalentBrain {
+    Reasoning,
+    Fast,
+    Local,
+}
+
+/// Localized identity of an Agent Talent: proposed name, Role (one line), Personality (multi-line).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TalentAgentIdentity {
+    pub name: String,
+    pub role: String,
+    pub personality: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TalentAgent {
+    /// By language tag, `fr` and `en` at least.
+    pub localized: BTreeMap<String, TalentAgentIdentity>,
+    /// Included Skills (folder names).
+    pub skills: Vec<String>,
+    /// Requested Connectors (identifiers).
+    pub connectors: Vec<String>,
+    pub brain: TalentBrain,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -79,4 +110,8 @@ pub enum TalentManifestError {
     UnknownKey,
     InvalidField(String),
     KindNotAllowed,
+    /// An autonomy key (`autonomous`, `actWithoutAsking`, `autonomy`): an Agent Talent never sets it.
+    AutonomyField,
+    /// A free text of an Agent Talent contains a secret; the field is named.
+    SecretFound(String),
 }

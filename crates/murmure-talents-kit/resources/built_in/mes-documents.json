@@ -1,0 +1,35 @@
+{
+  "connector": "files",
+  "manifest": {
+    "id": "mes-documents",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mes documents",
+        "summary": "Cherche, lis et range les fichiers des dossiers que tu as choisis."
+      },
+      "en": {
+        "name": "My documents",
+        "summary": "Search, read and organize the files in the folders you chose."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-files",
+      "edit-files"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

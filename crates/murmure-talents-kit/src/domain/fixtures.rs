@@ -65,5 +65,41 @@ pub fn manifest(
         },
         license: "MIT".to_owned(),
         origin: None,
+        agent: None,
     }
+}
+
+/// A Talent with code that supplies `capabilities`.
+pub fn supplier(id: &str, capabilities: &[TalentCapability]) -> TalentManifest {
+    TalentManifest {
+        kind: TalentKind::WithCode,
+        ..manifest(id, "1.0.0", capabilities, &[])
+    }
+}
+
+/// A valid Agent Talent manifest of the catalog, as JSON.
+pub fn agent_manifest_json() -> Value {
+    json!({
+        "id": "coach-voyage",
+        "version": "1.0.0",
+        "kind": "agent",
+        "localized": {
+            "fr": {"name": "Coach voyage", "summary": "Un Agent qui prépare tes voyages."},
+            "en": {"name": "Travel coach", "summary": "An Agent that plans your trips."}
+        },
+        "needs": ["travel"],
+        "capabilities": [],
+        "minimumMurmureVersion": "1.0.0",
+        "author": {"name": "Camille Dupont", "github": ["camille-dupont"]},
+        "license": "MIT",
+        "agent": {
+            "localized": {
+                "fr": {"name": "Voyageur", "role": "Prépare des itinéraires.", "personality": "Chaleureux.\nToujours concret."},
+                "en": {"name": "Traveler", "role": "Plans itineraries.", "personality": "Warm.\nAlways concrete."}
+            },
+            "skills": ["travel-coach"],
+            "connectors": ["calendrier"],
+            "brain": "reasoning"
+        }
+    })
 }

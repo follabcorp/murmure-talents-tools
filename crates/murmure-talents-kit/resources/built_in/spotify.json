@@ -1,0 +1,34 @@
+{
+  "connector": "spotify",
+  "manifest": {
+    "id": "spotify",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Spotify",
+        "summary": "Lance, mets en pause ou choisis ta musique sur Spotify, et gère tes playlists."
+      },
+      "en": {
+        "name": "Spotify",
+        "summary": "Play, pause or pick your music on Spotify, and manage your playlists."
+      }
+    },
+    "needs": [
+      "home"
+    ],
+    "capabilities": [
+      "control-media"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

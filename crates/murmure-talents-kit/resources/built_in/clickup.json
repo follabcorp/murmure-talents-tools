@@ -1,0 +1,35 @@
+{
+  "connector": "clickup",
+  "manifest": {
+    "id": "clickup",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "ClickUp",
+        "summary": "Consulte et fais avancer tes tâches ClickUp : listes, statuts, commentaires."
+      },
+      "en": {
+        "name": "ClickUp",
+        "summary": "See and move forward your ClickUp tasks: lists, statuses, comments."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-tasks",
+      "edit-tasks"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

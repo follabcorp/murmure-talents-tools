@@ -1,0 +1,35 @@
+{
+  "connector": "telegram",
+  "manifest": {
+    "id": "telegram",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Telegram",
+        "summary": "Lis les messages récents de ton bot Telegram et envoie-toi ou envoie à tes groupes un message en texte."
+      },
+      "en": {
+        "name": "Telegram",
+        "summary": "Read the recent messages of your Telegram bot and send a text message to yourself or to your groups."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-messages",
+      "send-messages"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

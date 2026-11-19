@@ -1,0 +1,35 @@
+{
+  "connector": "notion",
+  "manifest": {
+    "id": "notion",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Notion",
+        "summary": "Cherche, lis et complète tes pages et bases Notion."
+      },
+      "en": {
+        "name": "Notion",
+        "summary": "Search, read and update your Notion pages and databases."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-notes",
+      "edit-notes"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

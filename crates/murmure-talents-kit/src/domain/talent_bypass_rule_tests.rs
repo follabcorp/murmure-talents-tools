@@ -148,3 +148,15 @@ fn a_command_over_16_kib_is_not_decided_by_the_rule() {
     assert!(long.len() > TalentBypassRule::MAX_COMMAND_BYTES);
     assert_eq!(refused(&long), None);
 }
+
+#[test]
+fn the_bear_url_scheme_is_refused_only_when_a_non_blank_character_follows_the_colon() {
+    let bear = vec![app("bear", "bear", "Bear", "Bear", &["Bear"], "net.shinyfrog.bear", &["9K33E3U3T4.net.shinyfrog.bear"])];
+    let check = |command: &str| TalentBypassRule::check(command, &bear).map(|refusal| refusal.connector_id);
+    for command in ["open bear://x-callback-url/create?title=x", "open 'bear:/trash'", "open bear:create", "BEAR://x"] {
+        assert_eq!(check(command).as_deref(), Some("bear"), "{command}");
+    }
+    for command in ["echo bear: notes", "echo bear :x", r#"echo "bear:""#, "echo teddybear:x", "ls ~/Documents/bear"] {
+        assert_eq!(check(command), None, "{command}");
+    }
+}

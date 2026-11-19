@@ -1,0 +1,30 @@
+{
+  "connector": "web-search",
+  "manifest": {
+    "id": "chercher-sur-le-web",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Chercher sur le web",
+        "summary": "Cherche des informations sur le web avec ta propre clé de recherche."
+      },
+      "en": {
+        "name": "Search the web",
+        "summary": "Look up information on the web with your own search key."
+      }
+    },
+    "needs": [
+      "learning"
+    ],
+    "capabilities": [
+      "web-search"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

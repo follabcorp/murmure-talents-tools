@@ -1,0 +1,32 @@
+{
+  "connector": "imap-1",
+  "manifest": {
+    "id": "ma-boite-mail",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Ma boîte mail",
+        "summary": "Lis, cherche et range le courrier de n'importe quelle boîte (Gmail, iCloud, Orange, OVH…) et prépare tes réponses."
+      },
+      "en": {
+        "name": "My mailbox",
+        "summary": "Read, search and sort the mail of any mailbox (Gmail, iCloud, Orange, OVH…) and prepare replies."
+      }
+    },
+    "needs": [
+      "mail"
+    ],
+    "capabilities": [
+      "read-mail",
+      "send-mail",
+      "organize-mail"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

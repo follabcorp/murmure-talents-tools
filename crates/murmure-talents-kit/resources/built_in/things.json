@@ -1,0 +1,34 @@
+{
+  "connector": "things",
+  "manifest": {
+    "id": "things",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Things",
+        "summary": "Vois et crée tes tâches dans Things 3 sur ton Mac."
+      },
+      "en": {
+        "name": "Things",
+        "summary": "See and create your tasks in Things 3 on your Mac."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-tasks",
+      "edit-tasks"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

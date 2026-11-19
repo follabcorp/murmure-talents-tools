@@ -1,0 +1,28 @@
+{
+  "connector": "transit",
+  "manifest": {
+    "id": "mes-trajets",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mes trajets",
+        "summary": "Cherche des gares, des itinéraires, des départs en temps réel et des perturbations en France et en Allemagne, avec tes propres clés."
+      },
+      "en": {
+        "name": "My journeys",
+        "summary": "Look up stations, journeys, real-time departures and disruptions in France and Germany, with your own keys."
+      }
+    },
+    "needs": [
+      "travel"
+    ],
+    "capabilities": [],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

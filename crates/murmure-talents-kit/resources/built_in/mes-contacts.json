@@ -1,0 +1,34 @@
+{
+  "connector": "contacts",
+  "manifest": {
+    "id": "mes-contacts",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mes contacts",
+        "summary": "Cherche, ajoute et corrige les fiches de l'app Contacts de ton Mac."
+      },
+      "en": {
+        "name": "My contacts",
+        "summary": "Search, add and update the cards of the Contacts app on your Mac."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-contacts",
+      "edit-contacts"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

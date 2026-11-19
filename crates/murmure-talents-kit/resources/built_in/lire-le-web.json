@@ -1,0 +1,30 @@
+{
+  "connector": "web-reader",
+  "manifest": {
+    "id": "lire-le-web",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Lire le web",
+        "summary": "Lit une page web publique et en rend le texte, sans ouvrir de navigateur."
+      },
+      "en": {
+        "name": "Read the web",
+        "summary": "Reads a public web page as text, without opening a browser."
+      }
+    },
+    "needs": [
+      "learning"
+    ],
+    "capabilities": [
+      "web-search"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

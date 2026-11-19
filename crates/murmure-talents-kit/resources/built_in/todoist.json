@@ -1,0 +1,35 @@
+{
+  "connector": "todoist",
+  "manifest": {
+    "id": "todoist",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Todoist",
+        "summary": "Consulte et fais avancer tes tâches Todoist : projets, sections, filtres, commentaires."
+      },
+      "en": {
+        "name": "Todoist",
+        "summary": "See and move forward your Todoist tasks: projects, sections, filters, comments."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-tasks",
+      "edit-tasks"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

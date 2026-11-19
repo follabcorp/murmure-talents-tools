@@ -1,5 +1,5 @@
 //! `convert` end to end on a tiny source, then `validate` on the converted folder. The Catalogue itself is validated by
-//! its own CI (`talents-catalogue.yml`): this crate is also published alone, without it.
+//! the CI of `follabcorp/murmure-talents`: this crate is also published alone, without it.
 
 use std::fs;
 use std::path::Path;

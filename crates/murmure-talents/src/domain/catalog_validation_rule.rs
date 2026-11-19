@@ -1,8 +1,8 @@
 use std::collections::BTreeMap;
 
 use murmure_talents_kit::{
-    hex, TalentCapability, TalentDependencyRule, TalentFileVerification, TalentIndexFile, TalentManifest,
-    TalentManifestError, TalentManifestRule, TalentSource,
+    hex, TalentCapability, TalentDependencyRule, TalentFileVerification, TalentIndexFile, TalentKind, TalentManifest,
+    TalentManifestError, TalentManifestRule, TalentSource, TalentBuiltInResource,
 };
 use sha2::{Digest, Sha256};
 
@@ -39,6 +39,45 @@ impl CatalogValidationRule {
     /// are warnings, as are a `SKILL.md` that seems not English and one without a reply-language instruction; `TODO-fr`
     /// in `localized` is an error.
     pub fn validate(talents: &[CatalogSource], built_in: &[TalentManifest]) -> ValidationReport {
+        Self::validate_with_connectors(talents, built_in, &TalentBuiltInResource::embedded_connectors())
+    }
+
+    /// `validate`, plus the rules of the Agent Talents: each requested Connector is one of `known_connectors` (the
+    /// identifiers of the « Par Murmure » resources) and each included Skill is one the files of the Talent hold.
+    pub fn validate_with_connectors(
+        talents: &[CatalogSource],
+        built_in: &[TalentManifest],
+        known_connectors: &[String],
+    ) -> ValidationReport {
+        let mut report = Self::validate_talents(talents, built_in);
+        Self::validate_agents(talents, known_connectors, &mut report);
+        report
+    }
+
+    fn validate_agents(talents: &[CatalogSource], known_connectors: &[String], report: &mut ValidationReport) {
+        for source in talents {
+            let Ok(manifest) = Self::parse_manifest(&source.manifest_json).0 else { continue };
+            let Some(agent) = manifest.agent.filter(|_| manifest.id == source.directory_id) else { continue };
+            let mut reject = |message: String| {
+                report.errors.push(Diagnostic {
+                    kind: DiagnosticKind::InvalidContent,
+                    talent_id: manifest.id.clone(),
+                    message,
+                });
+            };
+            for connector in agent.connectors.iter().filter(|connector| !known_connectors.contains(connector)) {
+                reject(format!("Connecteur demandé inconnu : {connector}."));
+            }
+            let present: Vec<String> = SkillClaimRule::claims(&source.directory_id, &source.files)
+                .map(|claims| claims.into_iter().map(|claim| claim.name).collect())
+                .unwrap_or_default();
+            for skill in agent.skills.iter().filter(|skill| !present.contains(skill)) {
+                reject(format!("Compétence incluse absente des fichiers du Talent : {skill}."));
+            }
+        }
+    }
+
+    fn validate_talents(talents: &[CatalogSource], built_in: &[TalentManifest]) -> ValidationReport {
         let mut errors = Vec::new();
         let mut warnings = Vec::new();
         let mut reject = |id: &str, message: &str| {
@@ -72,7 +111,7 @@ impl CatalogValidationRule {
                     continue;
                 }
                 Err(error) => {
-                    reject(id, &format!("Manifeste ou ressources invalides : {error:?}."));
+                    reject(id, &format!("Manifeste ou ressources invalides : {}.", manifest_error_text(&error)));
                     continue;
                 }
             };
@@ -96,7 +135,15 @@ impl CatalogValidationRule {
             let Some(manifest) = manifests.get(source.directory_id.as_str()) else { continue };
             let chain = match TalentDependencyRule::missing(&manifest.id, &Default::default(), &catalog) {
                 Ok(chain) => {
-                    if !TalentDependencyRule::uncovered_capabilities(manifest, &catalog).is_empty() {
+                    if TalentDependencyRule::is_declared_by_capability(manifest) {
+                        // The suppliers are the Talents with code: the built-in ones (a Catalogue manifest is never `withCode`).
+                        let all: Vec<TalentManifest> = catalog.values().cloned().collect();
+                        let uncovered = TalentDependencyRule::uncovered_by_suppliers(manifest, &all);
+                        if !uncovered.is_empty() {
+                            let names: Vec<&str> = uncovered.iter().map(|capability| capability.wire()).collect();
+                            reject(&manifest.id, &format!("Aucun Talent avec code ne fournit : {}.", names.join(", ")));
+                        }
+                    } else if !TalentDependencyRule::uncovered_capabilities(manifest, &catalog).is_empty() {
                         reject(&manifest.id, "Capacités non couvertes par les dépendances.");
                     }
                     chain
@@ -108,7 +155,10 @@ impl CatalogValidationRule {
             };
             let mail_covered = chain.iter().filter_map(|id| catalog.get(id)).any(|dependency| {
                 dependency.capabilities.contains(&TalentCapability::SendMail)
-            });
+            }) || (TalentDependencyRule::is_declared_by_capability(manifest)
+                && catalog.values().any(|supplier| {
+                    supplier.kind == TalentKind::WithCode && supplier.capabilities.contains(&TalentCapability::SendMail)
+                }));
             for file in &source.files {
                 let Ok(text) = std::str::from_utf8(&file.data) else { continue };
                 if InstructionScanRule::is_suspicious(text) {
@@ -200,4 +250,13 @@ impl CatalogValidationRule {
 
 fn is_executable(data: &[u8]) -> bool {
     data.starts_with(b"#!") || data.get(..4).is_some_and(|prefix| EXECUTABLE_HEADERS.iter().any(|header| header == prefix))
+}
+
+/// The readable reason of a refused manifest; the other errors keep their name.
+fn manifest_error_text(error: &TalentManifestError) -> String {
+    match error {
+        TalentManifestError::AutonomyField => "Un Talent d'Agent ne peut pas activer « Agir sans demander »".to_owned(),
+        TalentManifestError::SecretFound(field) => format!("Secret détecté dans {field}"),
+        other => format!("{other:?}"),
+    }
 }

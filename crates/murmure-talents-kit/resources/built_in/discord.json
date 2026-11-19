@@ -1,0 +1,35 @@
+{
+  "connector": "discord",
+  "manifest": {
+    "id": "discord",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Discord",
+        "summary": "Lis les messages récents des salons de ton serveur Discord et envoie un message en texte ou une réaction avec ton bot."
+      },
+      "en": {
+        "name": "Discord",
+        "summary": "Read the recent messages of your Discord server channels and send a text message or a reaction with your bot."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-messages",
+      "send-messages"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

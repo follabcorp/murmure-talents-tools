@@ -1,0 +1,31 @@
+{
+  "connector": "caldav",
+  "manifest": {
+    "id": "mon-agenda-en-ligne",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mon agenda en ligne",
+        "summary": "Consulte et organise tes rendez-vous en ligne (Google, iCloud, Fastmail, Nextcloud…)."
+      },
+      "en": {
+        "name": "My online calendar",
+        "summary": "View and organize your online events (Google, iCloud, Fastmail, Nextcloud…)."
+      }
+    },
+    "needs": [
+      "calendar"
+    ],
+    "capabilities": [
+      "read-calendar",
+      "edit-calendar"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

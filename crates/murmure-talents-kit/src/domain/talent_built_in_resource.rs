@@ -7,12 +7,42 @@ use super::talent_manifest_rule::is_valid_identifier;
 use super::{TalentManifest, TalentManifestError, TalentManifestRule, TalentSource};
 
 /// The manifests shipped with the Relay, one file each in `resources/built_in/`.
-pub const BUILT_IN_MANIFESTS: [&str; 5] = [
+pub const BUILT_IN_MANIFESTS: [&str; 35] = [
     include_str!("../../resources/built_in/mes-mails.json"),
     include_str!("../../resources/built_in/mes-notes.json"),
     include_str!("../../resources/built_in/mes-rappels.json"),
     include_str!("../../resources/built_in/mon-calendrier.json"),
     include_str!("../../resources/built_in/naviguer-sur-le-web.json"),
+    include_str!("../../resources/built_in/chercher-sur-le-web.json"),
+    include_str!("../../resources/built_in/lire-le-web.json"),
+    include_str!("../../resources/built_in/ma-boite-mail.json"),
+    include_str!("../../resources/built_in/mes-contacts.json"),
+    include_str!("../../resources/built_in/mes-contacts-carddav.json"),
+    include_str!("../../resources/built_in/mes-messages.json"),
+    include_str!("../../resources/built_in/mon-agenda-en-ligne.json"),
+    include_str!("../../resources/built_in/obsidian.json"),
+    include_str!("../../resources/built_in/trello.json"),
+    include_str!("../../resources/built_in/asana.json"),
+    include_str!("../../resources/built_in/clickup.json"),
+    include_str!("../../resources/built_in/todoist.json"),
+    include_str!("../../resources/built_in/mes-documents.json"),
+    include_str!("../../resources/built_in/ma-maison.json"),
+    include_str!("../../resources/built_in/notion.json"),
+    include_str!("../../resources/built_in/google-drive.json"),
+    include_str!("../../resources/built_in/microsoft-365.json"),
+    include_str!("../../resources/built_in/things.json"),
+    include_str!("../../resources/built_in/telegram.json"),
+    include_str!("../../resources/built_in/slack.json"),
+    include_str!("../../resources/built_in/discord.json"),
+    include_str!("../../resources/built_in/bear.json"),
+    include_str!("../../resources/built_in/lumieres-hue.json"),
+    include_str!("../../resources/built_in/lumieres-govee.json"),
+    include_str!("../../resources/built_in/spotify.json"),
+    include_str!("../../resources/built_in/musique.json"),
+    include_str!("../../resources/built_in/mes-trajets.json"),
+    include_str!("../../resources/built_in/mes-photos.json"),
+    include_str!("../../resources/built_in/ma-sante.json"),
+    include_str!("../../resources/built_in/budget.json"),
 ];
 
 /// `{"connector":"<id>","manifest":{…}}`: the manifest with code of a Talent and the Connector it drives.
@@ -55,6 +85,18 @@ impl TalentBuiltInResource {
             manifest,
             manifest_json,
         })
+    }
+
+    /// The Connector identifiers of the embedded resources, sorted and distinct: what an Agent Talent may request.
+    pub fn embedded_connectors() -> Vec<String> {
+        let mut connectors: Vec<String> = BUILT_IN_MANIFESTS
+            .iter()
+            .filter_map(|data| Self::parse(data.as_bytes()).ok())
+            .map(|resource| resource.connector)
+            .collect();
+        connectors.sort();
+        connectors.dedup();
+        connectors
     }
 
     /// A built-in Talent is available when the definition of its Connector exists in the registry, even disabled.

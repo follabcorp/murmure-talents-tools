@@ -20,11 +20,24 @@ pub enum TalentCapability {
     EditNotes,
     WebSearch,
     BrowseWeb,
+    ReadContacts,
+    EditContacts,
+    ReadMessages,
+    SendMessages,
+    ReadTasks,
+    EditTasks,
+    ReadFiles,
+    EditFiles,
+    ControlHome,
+    ControlMedia,
+    ReadPhotos,
+    ReadHealth,
+    ReadFinances,
 }
 
 impl TalentCapability {
     /// In the order of display.
-    pub const ALL: [TalentCapability; 11] = [
+    pub const ALL: [TalentCapability; 24] = [
         Self::ReadMail,
         Self::SendMail,
         Self::OrganizeMail,
@@ -36,6 +49,19 @@ impl TalentCapability {
         Self::EditNotes,
         Self::WebSearch,
         Self::BrowseWeb,
+        Self::ReadContacts,
+        Self::EditContacts,
+        Self::ReadMessages,
+        Self::SendMessages,
+        Self::ReadTasks,
+        Self::EditTasks,
+        Self::ReadFiles,
+        Self::EditFiles,
+        Self::ControlHome,
+        Self::ControlMedia,
+        Self::ReadPhotos,
+        Self::ReadHealth,
+        Self::ReadFinances,
     ];
 
     /// The name in `talent.json` (`read-mail`).
@@ -52,6 +78,19 @@ impl TalentCapability {
             Self::EditNotes => "edit-notes",
             Self::WebSearch => "web-search",
             Self::BrowseWeb => "browse-web",
+            Self::ReadContacts => "read-contacts",
+            Self::EditContacts => "edit-contacts",
+            Self::ReadMessages => "read-messages",
+            Self::SendMessages => "send-messages",
+            Self::ReadTasks => "read-tasks",
+            Self::EditTasks => "edit-tasks",
+            Self::ReadFiles => "read-files",
+            Self::EditFiles => "edit-files",
+            Self::ControlHome => "control-home",
+            Self::ControlMedia => "control-media",
+            Self::ReadPhotos => "read-photos",
+            Self::ReadHealth => "read-health",
+            Self::ReadFinances => "read-finances",
         }
     }
 
@@ -61,20 +100,33 @@ impl TalentCapability {
             .find(|capability| capability.wire() == value)
     }
 
-    /// `read-*` and `web-search` read; `send-mail`, `organize-mail`, `edit-*` and `browse-web` act.
+    /// `read-*` and `web-search` read; `send-mail`, `organize-mail`, `edit-*` (contacts included) and `browse-web` act.
     pub fn level(self) -> CapabilityLevel {
         match self {
             Self::ReadMail
             | Self::ReadCalendar
             | Self::ReadReminders
             | Self::ReadNotes
-            | Self::WebSearch => CapabilityLevel::Read,
+            | Self::WebSearch
+            | Self::ReadContacts
+            | Self::ReadMessages
+            | Self::ReadTasks
+            | Self::ReadFiles
+            | Self::ReadPhotos
+            | Self::ReadHealth
+            | Self::ReadFinances => CapabilityLevel::Read,
             Self::SendMail
             | Self::OrganizeMail
             | Self::EditCalendar
             | Self::EditReminders
             | Self::EditNotes
-            | Self::BrowseWeb => CapabilityLevel::Act,
+            | Self::BrowseWeb
+            | Self::EditContacts
+            | Self::SendMessages
+            | Self::EditTasks
+            | Self::EditFiles
+            | Self::ControlHome
+            | Self::ControlMedia => CapabilityLevel::Act,
         }
     }
 }

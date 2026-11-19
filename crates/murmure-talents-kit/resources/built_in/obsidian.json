@@ -1,0 +1,35 @@
+{
+  "connector": "obsidian",
+  "manifest": {
+    "id": "obsidian",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mon coffre Obsidian",
+        "summary": "Cherche, lis et complète les notes de ton coffre Obsidian."
+      },
+      "en": {
+        "name": "My Obsidian vault",
+        "summary": "Search, read and update the notes of your Obsidian vault."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-notes",
+      "edit-notes"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

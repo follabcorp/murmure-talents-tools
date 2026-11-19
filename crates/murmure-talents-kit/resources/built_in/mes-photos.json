@@ -1,0 +1,33 @@
+{
+  "connector": "photos",
+  "manifest": {
+    "id": "mes-photos",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mes photos",
+        "summary": "Retrouve et joins des photos de l'app Photos de ton Mac."
+      },
+      "en": {
+        "name": "My photos",
+        "summary": "Find and attach photos from the Photos app on your Mac."
+      }
+    },
+    "needs": [
+      "home"
+    ],
+    "capabilities": [
+      "read-photos"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

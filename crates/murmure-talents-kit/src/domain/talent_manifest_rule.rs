@@ -7,12 +7,20 @@ use strict_json::parse_strict_json;
 use unicode_segmentation::UnicodeSegmentation;
 
 use super::{
-    LocalizedText, SemanticVersion, TalentAuthor, TalentCapability, TalentKind, TalentManifest,
-    TalentManifestError, TalentNeed, TalentOrigin, TalentOriginKind, TalentPlatform, TalentSource,
+    LocalizedText, SemanticVersion, TalentAgent, TalentAgentIdentity, TalentAuthor, TalentBrain, TalentCapability,
+    TalentKind, TalentManifest, TalentManifestError, TalentNeed, TalentOrigin, TalentOriginKind, TalentPlatform,
+    TalentSecretScan, TalentSource,
 };
 
 const MANIFEST_BYTES_MAX: usize = 16_384;
 const URL_BYTES_MAX: usize = 256;
+const AGENT_NAME_GRAPHEMES_MAX: usize = 40;
+const AGENT_ROLE_GRAPHEMES_MAX: usize = 120;
+const AGENT_PERSONALITY_GRAPHEMES_MAX: usize = 4_000;
+const AGENT_SKILLS_MAX: usize = 16;
+const AGENT_CONNECTORS_MAX: usize = 16;
+/// The keys that would let an Agent Talent act without asking: refused with their own error, anywhere they stand.
+const AUTONOMY_KEYS: [&str; 3] = ["autonomous", "actWithoutAsking", "autonomy"];
 
 pub struct TalentManifestRule;
 
@@ -26,6 +34,7 @@ impl TalentManifestRule {
             return Err(Failure::TooLarge);
         }
         let value = parse_strict_json(data).map_err(|_| Failure::MalformedJson)?;
+        refuse_autonomy_keys(&value)?;
         let keys = [
             "id",
             "version",
@@ -39,6 +48,7 @@ impl TalentManifestRule {
             "author",
             "license",
             "origin",
+            "agent",
         ];
         let root = object(Some(&value), "manifest", &keys)?;
         let id = string(root.get("id"), "id")?;
@@ -49,6 +59,7 @@ impl TalentManifestRule {
         let kind = match string(root.get("kind"), "kind")? {
             "textOnly" => TalentKind::TextOnly,
             "withCode" => TalentKind::WithCode,
+            "agent" => TalentKind::Agent,
             _ => return Err(invalid("kind")),
         };
         if kind == TalentKind::WithCode && source != TalentSource::Embedded {
@@ -59,7 +70,7 @@ impl TalentManifestRule {
         let capabilities = list(
             root.get("capabilities"),
             "capabilities",
-            0..=11,
+            0..=TalentCapability::ALL.len(),
             TalentCapability::from_wire,
         )?;
         let requires = match root.get("requires") {
@@ -87,6 +98,15 @@ impl TalentManifestRule {
             Some(value) => Some(origin(value)?),
             None => None,
         };
+        let agent = match (kind, root.get("agent")) {
+            (TalentKind::Agent, Some(value)) => Some(read_agent(value)?),
+            (TalentKind::Agent, None) => return Err(invalid("agent")),
+            (_, Some(_)) => return Err(invalid("agent")),
+            (_, None) => None,
+        };
+        if kind == TalentKind::Agent {
+            refuse_secret_in_public_texts(&localized, &author)?;
+        }
         Ok(TalentManifest {
             id: id.to_owned(),
             version,
@@ -100,7 +120,95 @@ impl TalentManifestRule {
             author,
             license,
             origin,
+            agent,
         })
+    }
+}
+
+/// An autonomy key at the root or in the `agent` object (the only places a manifest has free keys to try).
+fn refuse_autonomy_keys(value: &Value) -> Result<(), Failure> {
+    let Some(root) = value.as_object() else { return Ok(()) };
+    let inside = root.get("agent").and_then(Value::as_object);
+    let found = std::iter::once(root).chain(inside).any(|object| AUTONOMY_KEYS.iter().any(|key| object.contains_key(*key)));
+    if found {
+        Err(Failure::AutonomyField)
+    } else {
+        Ok(())
+    }
+}
+
+fn read_agent(value: &Value) -> Result<TalentAgent, Failure> {
+    let agent = object(Some(value), "agent", &["localized", "skills", "connectors", "brain"])?;
+    let brain = match string(agent.get("brain"), "agent.brain")? {
+        "reasoning" => TalentBrain::Reasoning,
+        "fast" => TalentBrain::Fast,
+        "local" => TalentBrain::Local,
+        _ => return Err(invalid("agent.brain")),
+    };
+    Ok(TalentAgent {
+        localized: agent_identities(agent.get("localized"))?,
+        skills: list(agent.get("skills"), "agent.skills", 0..=AGENT_SKILLS_MAX, identifier)?,
+        connectors: list(agent.get("connectors"), "agent.connectors", 0..=AGENT_CONNECTORS_MAX, identifier)?,
+        brain,
+    })
+}
+
+fn identifier(name: &str) -> Option<String> {
+    is_valid_identifier(name).then(|| name.to_owned())
+}
+
+/// The same languages rules as `localized`; each entry holds a name, a one-line Role and a multi-line Personality,
+/// none of them carrying a secret.
+fn agent_identities(value: Option<&Value>) -> Result<BTreeMap<String, TalentAgentIdentity>, Failure> {
+    let entries = value.and_then(Value::as_object).filter(|entries| {
+        (2..=16).contains(&entries.len()) && entries.contains_key("fr") && entries.contains_key("en")
+    });
+    let entries = entries.ok_or_else(|| invalid("agent.localized"))?;
+    let mut identities = BTreeMap::new();
+    for (language, entry) in entries {
+        if !is_valid_language(language) {
+            return Err(invalid("agent.localized"));
+        }
+        let entry = object(Some(entry), "agent.localized", &["name", "role", "personality"])?;
+        let name = clean_text(entry.get("name"), "agent.localized.name", AGENT_NAME_GRAPHEMES_MAX)?;
+        refuse_secret(&name, "agent.localized.name")?;
+        let role = clean_text(entry.get("role"), "agent.localized.role", AGENT_ROLE_GRAPHEMES_MAX)?;
+        refuse_secret(&role, "agent.localized.role")?;
+        let personality = multiline_text(entry.get("personality"), "agent.localized.personality", AGENT_PERSONALITY_GRAPHEMES_MAX)?;
+        refuse_secret(&personality, "agent.localized.personality")?;
+        identities.insert(language.clone(), TalentAgentIdentity { name, role, personality });
+    }
+    Ok(identities)
+}
+
+/// ADR-0030: an Agent Talent never carries a secret, so its other public free texts are scanned too.
+fn refuse_secret_in_public_texts(localized: &BTreeMap<String, LocalizedText>, author: &TalentAuthor) -> Result<(), Failure> {
+    for text in localized.values() {
+        refuse_secret(&text.name, "localized.name")?;
+        refuse_secret(&text.summary, "localized.summary")?;
+    }
+    refuse_secret(&author.name, "author.name")
+}
+
+fn refuse_secret(text: &str, field: &str) -> Result<(), Failure> {
+    match TalentSecretScan::find(text) {
+        Some(_) => Err(Failure::SecretFound(field.to_owned())),
+        None => Ok(()),
+    }
+}
+
+/// Trimmed at the edges, 1 to `limit` graphemes; line breaks are allowed, any other control character is not.
+fn multiline_text(value: Option<&Value>, field: &str, limit: usize) -> Result<String, Failure> {
+    let original = string(value, field)?;
+    let text = original.trim_matches(|character| is_edge_space(character) || character == '\n');
+    let graphemes = text.graphemes(true).count();
+    let forbidden = original
+        .chars()
+        .any(|character| (character.is_control() && character != '\n') || matches!(character, '\u{2028}' | '\u{2029}'));
+    if (1..=limit).contains(&graphemes) && !forbidden {
+        Ok(text.to_owned())
+    } else {
+        Err(invalid(field))
     }
 }
 

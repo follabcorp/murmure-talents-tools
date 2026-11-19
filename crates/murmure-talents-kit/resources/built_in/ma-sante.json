@@ -1,0 +1,33 @@
+{
+  "connector": "health",
+  "manifest": {
+    "id": "ma-sante",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Ma santé",
+        "summary": "Décris et compare tes pas, ton sommeil, ton poids et ton activité reçus de ton iPhone, sans avis médical."
+      },
+      "en": {
+        "name": "My health",
+        "summary": "Describe and compare the steps, sleep, weight and activity your iPhone sent, with no medical advice."
+      }
+    },
+    "needs": [
+      "health"
+    ],
+    "capabilities": [
+      "read-health"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

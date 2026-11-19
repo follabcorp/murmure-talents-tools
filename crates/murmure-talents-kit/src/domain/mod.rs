@@ -17,6 +17,7 @@ mod talent_manifest;
 mod talent_manifest_rule;
 mod talent_operation_error;
 mod talent_revocation_reason;
+mod talent_secret_scan;
 mod talent_vocabulary;
 
 pub use covered_apps_file::CoveredAppsFile;
@@ -31,7 +32,9 @@ pub use talent_catalog_diff_rule::{
     TalentCatalogDiff, TalentCatalogDiffRule, TalentChange, TalentChangeKind, TalentDiffError,
     TalentDiffErrorKind, TalentSnapshot,
 };
-pub use talent_dependency_rule::{TalentDependencyError, TalentDependencyRule};
+pub use talent_dependency_rule::{
+    CapabilitySupplierPool, TalentDependencyError, TalentDependencyRule, UncoveredCapability,
+};
 pub use talent_export_projection::{TalentExportError, TalentExportFile, TalentExportProjection};
 pub use talent_file_verification::{hex, SkillFiles, TalentBundleRule, TalentFileVerification};
 pub use talent_guard_events::TalentGuardEvents;
@@ -40,12 +43,13 @@ pub use talent_index::{
 };
 pub use talent_index_verification::{TalentCatalogKeyRule, TalentIndexVerification};
 pub use talent_manifest::{
-    LocalizedText, TalentAuthor, TalentKind, TalentManifest, TalentManifestError, TalentOrigin,
+    LocalizedText, TalentAgent, TalentAgentIdentity, TalentAuthor, TalentBrain, TalentKind, TalentManifest, TalentManifestError, TalentOrigin,
     TalentOriginKind, TalentPlatform, TalentSource,
 };
 pub use talent_manifest_rule::{is_valid_identifier, TalentManifestRule};
 pub use talent_operation_error::TalentOperationError;
 pub use talent_revocation_reason::TalentRevocationReason;
+pub use talent_secret_scan::TalentSecretScan;
 pub use talent_vocabulary::{CapabilityLevel, TalentCapability, TalentNeed};
 
 #[cfg(test)]
@@ -76,5 +80,7 @@ mod talent_index_tests;
 mod talent_index_verification_tests;
 #[cfg(test)]
 mod talent_manifest_rule_tests;
+#[cfg(test)]
+mod talent_secret_scan_tests;
 #[cfg(test)]
 mod talent_vocabulary_tests;

@@ -1,0 +1,34 @@
+{
+  "connector": "govee",
+  "manifest": {
+    "id": "lumieres-govee",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Lumières Govee",
+        "summary": "Allume, éteins ou règle tes lumières Govee, sans Home Assistant."
+      },
+      "en": {
+        "name": "Govee lights",
+        "summary": "Turn on, turn off or adjust your Govee lights, without Home Assistant."
+      }
+    },
+    "needs": [
+      "home"
+    ],
+    "capabilities": [
+      "control-home"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

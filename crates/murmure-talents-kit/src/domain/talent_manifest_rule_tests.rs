@@ -2,10 +2,10 @@
 
 use serde_json::{json, Value};
 
-use super::fixtures::{bytes, manifest_json};
+use super::fixtures::{agent_manifest_json, bytes, manifest_json};
 use super::{
-    SemanticVersion, TalentCapability, TalentKind, TalentManifestError, TalentManifestRule,
-    TalentNeed, TalentPlatform, TalentSource,
+    SemanticVersion, TalentBrain, TalentCapability, TalentKind, TalentManifestError,
+    TalentManifestRule, TalentNeed, TalentPlatform, TalentSource,
 };
 
 fn parse(value: &Value) -> Result<super::TalentManifest, TalentManifestError> {
@@ -413,7 +413,10 @@ fn an_author_a_license_and_an_origin_follow_their_bounds() {
     );
 }
 
-fn parse_from(value: &Value, source: TalentSource) -> Result<super::TalentManifest, TalentManifestError> {
+fn parse_from(
+    value: &Value,
+    source: TalentSource,
+) -> Result<super::TalentManifest, TalentManifestError> {
     TalentManifestRule::parse(&bytes(value), source)
 }
 
@@ -435,9 +438,15 @@ fn a_catalog_manifest_names_one_to_four_github_accounts() {
 #[test]
 fn a_catalog_manifest_without_github_is_refused_but_other_sources_accept_it() {
     let legacy = with(|value| {
-        value["author"].as_object_mut().expect("an author").remove("github");
+        value["author"]
+            .as_object_mut()
+            .expect("an author")
+            .remove("github");
     });
-    assert_eq!(parse_from(&legacy, TalentSource::Catalog), invalid("author.github"));
+    assert_eq!(
+        parse_from(&legacy, TalentSource::Catalog),
+        invalid("author.github")
+    );
     for source in [TalentSource::LocalFolder, TalentSource::Embedded] {
         let manifest = parse_from(&legacy, source).expect("the legacy author stays readable");
         assert!(manifest.author.github.is_empty());
@@ -446,7 +455,8 @@ fn a_catalog_manifest_without_github_is_refused_but_other_sources_accept_it() {
 
 #[test]
 fn a_non_catalog_manifest_may_carry_github_accounts() {
-    let manifest = parse_from(&with_github(json!(["camille"])), TalentSource::LocalFolder).expect("accounts");
+    let manifest =
+        parse_from(&with_github(json!(["camille"])), TalentSource::LocalFolder).expect("accounts");
     assert_eq!(manifest.author.github, ["camille"]);
 }
 
@@ -457,11 +467,31 @@ fn a_github_account_follows_the_github_syntax() {
         assert!(parse(&with_github(json!([valid]))).is_ok(), "{valid:?}");
     }
     let too_long = "a".repeat(40);
-    for refused in ["-camille", "camille-", "cam--ille", "cam_ille", "cam ille", "@camille", "", "é", too_long.as_str()] {
-        assert_eq!(parse(&with_github(json!([refused]))), invalid("author.github"), "{refused:?}");
+    for refused in [
+        "-camille",
+        "camille-",
+        "cam--ille",
+        "cam_ille",
+        "cam ille",
+        "@camille",
+        "",
+        "é",
+        too_long.as_str(),
+    ] {
+        assert_eq!(
+            parse(&with_github(json!([refused]))),
+            invalid("author.github"),
+            "{refused:?}"
+        );
     }
-    assert_eq!(parse(&with_github(json!(["camille", "camille"]))), invalid("author.github"));
-    assert_eq!(parse(&with_github(json!("camille"))), invalid("author.github"));
+    assert_eq!(
+        parse(&with_github(json!(["camille", "camille"]))),
+        invalid("author.github")
+    );
+    assert_eq!(
+        parse(&with_github(json!("camille"))),
+        invalid("author.github")
+    );
 }
 
 #[test]
@@ -469,9 +499,15 @@ fn a_public_repository_origin_needs_its_url_while_the_ecosystem_ones_keep_theirs
     let public = with(|value| {
         value["origin"] = json!({"kind": "public", "author": "JayRHa", "url": "https://github.com/JayRHa/agent-skills"});
     });
-    let origin = parse(&public).expect("a public origin").origin.expect("an origin");
+    let origin = parse(&public)
+        .expect("a public origin")
+        .origin
+        .expect("an origin");
     assert_eq!(origin.kind, super::TalentOriginKind::Public);
-    assert_eq!(origin.url.as_deref(), Some("https://github.com/JayRHa/agent-skills"));
+    assert_eq!(
+        origin.url.as_deref(),
+        Some("https://github.com/JayRHa/agent-skills")
+    );
 
     let without_url = with(|value| value["origin"] = json!({"kind": "public", "author": "JayRHa"}));
     assert_eq!(parse(&without_url), invalid("origin.url"));
@@ -480,4 +516,175 @@ fn a_public_repository_origin_needs_its_url_while_the_ecosystem_ones_keep_theirs
         let value = with(|value| value["origin"] = json!({"kind": kind, "author": "jdoe"}));
         assert!(parse(&value).is_ok(), "{kind}");
     }
+}
+
+fn agent_with(change: impl FnOnce(&mut Value)) -> Value {
+    let mut value = agent_manifest_json();
+    change(&mut value);
+    value
+}
+
+fn failure(value: &Value) -> TalentManifestError {
+    parse(value).expect_err("a refused manifest")
+}
+
+#[test]
+fn an_agent_manifest_is_read_with_all_its_fields_from_the_catalog_and_a_local_folder() {
+    for source in [TalentSource::Catalog, TalentSource::LocalFolder] {
+        let manifest = TalentManifestRule::parse(&bytes(&agent_manifest_json()), source)
+            .expect("a valid Agent Talent");
+        assert_eq!(manifest.kind, TalentKind::Agent);
+        let agent = manifest.agent.expect("the agent object");
+        assert_eq!(agent.localized["en"].name, "Traveler");
+        assert_eq!(agent.localized["fr"].role, "Prépare des itinéraires.");
+        assert_eq!(
+            agent.localized["fr"].personality,
+            "Chaleureux.\nToujours concret."
+        );
+        assert_eq!(agent.skills, ["travel-coach"]);
+        assert_eq!(agent.connectors, ["calendrier"]);
+        assert_eq!(agent.brain, TalentBrain::Reasoning);
+    }
+}
+
+#[test]
+fn the_agent_object_is_required_for_kind_agent_and_refused_for_the_other_kinds() {
+    assert_eq!(
+        failure(&agent_with(|value| {
+            value.as_object_mut().unwrap().remove("agent");
+        })),
+        TalentManifestError::InvalidField("agent".to_owned())
+    );
+    let text_with_agent = with(|value| value["agent"] = agent_manifest_json()["agent"].clone());
+    assert_eq!(
+        failure(&text_with_agent),
+        TalentManifestError::InvalidField("agent".to_owned())
+    );
+}
+
+#[test]
+fn a_brain_outside_the_closed_list_is_refused() {
+    let value = agent_with(|value| value["agent"]["brain"] = json!("genius"));
+    assert_eq!(
+        failure(&value),
+        TalentManifestError::InvalidField("agent.brain".to_owned())
+    );
+}
+
+#[test]
+fn an_autonomy_key_is_refused_with_its_own_error_in_the_agent_object_and_at_the_root() {
+    for key in ["autonomous", "actWithoutAsking", "autonomy"] {
+        let inside = agent_with(|value| value["agent"][key] = json!(true));
+        assert_eq!(
+            failure(&inside),
+            TalentManifestError::AutonomyField,
+            "agent.{key}"
+        );
+    }
+    let root = agent_with(|value| value["autonomy"] = json!("full"));
+    assert_eq!(failure(&root), TalentManifestError::AutonomyField);
+}
+
+#[test]
+fn a_secret_in_a_free_text_of_the_agent_is_refused_and_the_field_is_named() {
+    // Short enough for the 40-grapheme name bound.
+    let key = "AKIAIOSFODNN7EXAMPLE";
+    for field in ["name", "role", "personality"] {
+        let value = agent_with(|value| {
+            value["agent"]["localized"]["en"][field] = json!(format!("Use {key} always"))
+        });
+        assert_eq!(
+            failure(&value),
+            TalentManifestError::SecretFound(format!("agent.localized.{field}")),
+            "{field}"
+        );
+    }
+}
+
+#[test]
+fn a_secret_in_a_public_text_is_refused_for_an_agent_talent_only() {
+    // Short enough for the 40-grapheme name bound.
+    let key = "AKIAIOSFODNN7EXAMPLE";
+    let text = format!("Use {key} always");
+    let agent = agent_with(|value| value["localized"]["en"]["summary"] = json!(text));
+    assert_eq!(failure(&agent), TalentManifestError::SecretFound("localized.summary".to_owned()));
+    let agent = agent_with(|value| value["localized"]["en"]["name"] = json!(text));
+    assert_eq!(failure(&agent), TalentManifestError::SecretFound("localized.name".to_owned()));
+    let agent = agent_with(|value| value["author"]["name"] = json!(text));
+    assert_eq!(failure(&agent), TalentManifestError::SecretFound("author.name".to_owned()));
+    let text_only = with(|value| value["localized"]["en"]["summary"] = json!(text));
+    assert!(parse(&text_only).is_ok());
+}
+
+#[test]
+fn the_role_holds_120_graphemes_on_one_line_and_the_personality_may_span_lines() {
+    let role =
+        |text: String| agent_with(|value| value["agent"]["localized"]["fr"]["role"] = json!(text));
+    assert!(parse(&role("r".repeat(120))).is_ok());
+    assert_eq!(
+        failure(&role("r".repeat(121))),
+        TalentManifestError::InvalidField("agent.localized.role".to_owned())
+    );
+    assert_eq!(
+        failure(&role("a\nb".to_owned())),
+        TalentManifestError::InvalidField("agent.localized.role".to_owned())
+    );
+    let personality = |text: String| {
+        agent_with(|value| value["agent"]["localized"]["fr"]["personality"] = json!(text))
+    };
+    assert!(parse(&personality("p".repeat(4_000))).is_ok());
+    assert_eq!(
+        failure(&personality("p".repeat(4_001))),
+        TalentManifestError::InvalidField("agent.localized.personality".to_owned())
+    );
+    assert_eq!(
+        failure(&personality("a\tb".to_owned())),
+        TalentManifestError::InvalidField("agent.localized.personality".to_owned())
+    );
+}
+
+#[test]
+fn the_agent_name_and_the_languages_follow_the_localized_rules() {
+    let long_name =
+        agent_with(|value| value["agent"]["localized"]["en"]["name"] = json!("n".repeat(41)));
+    assert_eq!(
+        failure(&long_name),
+        TalentManifestError::InvalidField("agent.localized.name".to_owned())
+    );
+    let no_english = agent_with(|value| {
+        value["agent"]["localized"]
+            .as_object_mut()
+            .unwrap()
+            .remove("en");
+    });
+    assert_eq!(
+        failure(&no_english),
+        TalentManifestError::InvalidField("agent.localized".to_owned())
+    );
+}
+
+#[test]
+fn skills_and_connectors_hold_16_distinct_entries_at_most() {
+    let names = |count: usize| {
+        (0..count)
+            .map(|index| format!("item-{index}"))
+            .collect::<Vec<_>>()
+    };
+    let connectors =
+        |list: Vec<String>| agent_with(|value| value["agent"]["connectors"] = json!(list));
+    assert!(parse(&connectors(names(16))).is_ok());
+    assert_eq!(
+        failure(&connectors(names(17))),
+        TalentManifestError::InvalidField("agent.connectors".to_owned())
+    );
+    let skills = |list: Vec<&str>| agent_with(|value| value["agent"]["skills"] = json!(list));
+    assert_eq!(
+        failure(&skills(vec!["a", "a"])),
+        TalentManifestError::InvalidField("agent.skills".to_owned())
+    );
+    assert_eq!(
+        failure(&skills(vec!["Not Valid"])),
+        TalentManifestError::InvalidField("agent.skills".to_owned())
+    );
+    assert!(parse(&skills(vec![])).is_ok());
 }

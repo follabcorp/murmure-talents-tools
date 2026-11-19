@@ -1,0 +1,31 @@
+{
+  "connector": "carddav",
+  "manifest": {
+    "id": "mes-contacts-carddav",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Mes contacts en ligne",
+        "summary": "Cherche, ajoute et corrige tes contacts en ligne (iCloud, Google, Fastmail, Nextcloud…)."
+      },
+      "en": {
+        "name": "My online contacts",
+        "summary": "Search, add and update your online contacts (iCloud, Google, Fastmail, Nextcloud…)."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-contacts",
+      "edit-contacts"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}

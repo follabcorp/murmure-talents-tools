@@ -1,0 +1,34 @@
+{
+  "connector": "hue",
+  "manifest": {
+    "id": "lumieres-hue",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Lumières Hue",
+        "summary": "Allume, éteins ou règle les lumières Philips Hue de ta maison, sans Home Assistant."
+      },
+      "en": {
+        "name": "Hue lights",
+        "summary": "Turn on, turn off or adjust your Philips Hue lights, without Home Assistant."
+      }
+    },
+    "needs": [
+      "home"
+    ],
+    "capabilities": [
+      "control-home"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}
