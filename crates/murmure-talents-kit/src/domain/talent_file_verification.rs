@@ -103,7 +103,7 @@ impl TalentBundleRule {
         downloaded: &BTreeMap<String, Vec<u8>>,
     ) -> Result<BTreeMap<String, SkillFiles>, TalentOperationError> {
         let invalid = TalentOperationError::InvalidResources;
-        if manifest.kind != TalentKind::TextOnly
+        if manifest.kind == TalentKind::WithCode
             || downloaded
                 .values()
                 .any(|data| std::str::from_utf8(data).is_err())
