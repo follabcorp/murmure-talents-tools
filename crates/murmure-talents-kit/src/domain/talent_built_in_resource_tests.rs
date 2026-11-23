@@ -285,9 +285,9 @@ fn my_messages_drives_the_messages_connector_on_macos_reads_conversations_and_se
     assert_eq!((manifest.author.name.as_str(), manifest.license.as_str()), ("Murmure", "MIT"));
 }
 
-/// Only « Mes messages », « Telegram », « Slack » and « Discord » send messages.
+/// Only « Mes messages », « Telegram », « Slack », « Discord » and « Microsoft Teams » send messages.
 #[test]
-fn only_the_four_message_talents_declare_the_send_messages_capability() {
+fn only_the_five_message_talents_declare_the_send_messages_capability() {
     use super::TalentCapability;
     let senders: Vec<String> = BUILT_IN_MANIFESTS
         .iter()
@@ -297,7 +297,7 @@ fn only_the_four_message_talents_declare_the_send_messages_capability() {
         .collect();
     let mut senders = senders;
     senders.sort();
-    assert_eq!(senders, ["discord", "mes-messages", "slack", "telegram"]);
+    assert_eq!(senders, ["discord", "mes-messages", "slack", "teams", "telegram"]);
 }
 
 /// « Telegram »: the Connector `telegram`, macOS and Linux, need `organizing`, the two messages capabilities (no new one).
@@ -322,8 +322,8 @@ fn telegram_drives_the_telegram_connector_on_macos_and_linux_with_the_messages_c
         .map(|text| TalentBuiltInResource::parse(text.as_bytes()).expect("built-in").manifest)
         .collect();
     let suppliers = TalentDependencyRule::suppliers(&manifests);
-    assert_eq!(suppliers[&TalentCapability::ReadMessages], ["discord", "mes-messages", "slack", "telegram"]);
-    assert_eq!(suppliers[&TalentCapability::SendMessages], ["discord", "mes-messages", "slack", "telegram"]);
+    assert_eq!(suppliers[&TalentCapability::ReadMessages], ["discord", "mes-messages", "slack", "teams", "telegram"]);
+    assert_eq!(suppliers[&TalentCapability::SendMessages], ["discord", "mes-messages", "slack", "teams", "telegram"]);
 }
 
 /// The three task Talents: one Connector each, the same two capabilities, the same need, macOS and Linux.
@@ -492,11 +492,11 @@ fn things_drives_the_things_connector_on_macos_only_with_the_task_capabilities()
     assert_eq!((manifest.author.name.as_str(), manifest.license.as_str()), ("Murmure", "MIT"));
 }
 
-/// « Slack » and « Discord »: one Connector each, macOS and Linux, need `organizing`, the two messages capabilities (no new one).
+/// « Slack », « Discord » and « Microsoft Teams »: one Connector each, macOS and Linux, need `organizing`, the two messages capabilities (no new one).
 #[test]
-fn slack_and_discord_drive_their_connectors_on_macos_and_linux_with_the_messages_capabilities() {
+fn slack_discord_and_teams_drive_their_connectors_on_macos_and_linux_with_the_messages_capabilities() {
     use super::{TalentCapability, TalentNeed, TalentPlatform};
-    for (id, name) in [("slack", "Slack"), ("discord", "Discord")] {
+    for (id, name) in [("slack", "Slack"), ("discord", "Discord"), ("teams", "Microsoft Teams")] {
         let resource = built_in(id);
         assert_eq!(resource.connector, id);
         let manifest = resource.manifest;

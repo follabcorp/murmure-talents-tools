@@ -7,7 +7,7 @@ use super::talent_manifest_rule::is_valid_identifier;
 use super::{TalentManifest, TalentManifestError, TalentManifestRule, TalentSource};
 
 /// The manifests shipped with the Relay, one file each in `resources/built_in/`.
-pub const BUILT_IN_MANIFESTS: [&str; 35] = [
+pub const BUILT_IN_MANIFESTS: [&str; 36] = [
     include_str!("../../resources/built_in/mes-mails.json"),
     include_str!("../../resources/built_in/mes-notes.json"),
     include_str!("../../resources/built_in/mes-rappels.json"),
@@ -34,6 +34,7 @@ pub const BUILT_IN_MANIFESTS: [&str; 35] = [
     include_str!("../../resources/built_in/telegram.json"),
     include_str!("../../resources/built_in/slack.json"),
     include_str!("../../resources/built_in/discord.json"),
+    include_str!("../../resources/built_in/teams.json"),
     include_str!("../../resources/built_in/bear.json"),
     include_str!("../../resources/built_in/lumieres-hue.json"),
     include_str!("../../resources/built_in/lumieres-govee.json"),

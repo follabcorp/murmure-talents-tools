@@ -1,0 +1,35 @@
+{
+  "connector": "teams",
+  "manifest": {
+    "id": "teams",
+    "version": "1.0.0",
+    "kind": "withCode",
+    "localized": {
+      "fr": {
+        "name": "Microsoft Teams",
+        "summary": "Lis tes discussions et canaux Teams, cherche dans tes messages et envoie un texte (compte professionnel ou scolaire)."
+      },
+      "en": {
+        "name": "Microsoft Teams",
+        "summary": "Read your Teams chats and channels, search your messages and send a text (work or school account)."
+      }
+    },
+    "needs": [
+      "organizing"
+    ],
+    "capabilities": [
+      "read-messages",
+      "send-messages"
+    ],
+    "requires": [],
+    "minimumMurmureVersion": "1.0.0",
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "author": {
+      "name": "Murmure"
+    },
+    "license": "MIT"
+  }
+}
