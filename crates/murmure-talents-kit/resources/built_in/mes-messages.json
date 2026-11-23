@@ -2,23 +2,24 @@
   "connector": "messages",
   "manifest": {
     "id": "mes-messages",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "kind": "withCode",
     "localized": {
       "fr": {
         "name": "Mes messages",
-        "summary": "Résume tes conversations récentes et retrouve un message dans l'app Messages de ton Mac."
+        "summary": "Résume tes conversations récentes et retrouve un message dans l'app Messages de ton Mac, et envoie un message quand tu valides."
       },
       "en": {
         "name": "My messages",
-        "summary": "Summarize your recent conversations and find a message in the Messages app on your Mac."
+        "summary": "Summarize your recent conversations and find a message in the Messages app on your Mac, and send a message when you approve."
       }
     },
     "needs": [
       "organizing"
     ],
     "capabilities": [
-      "read-messages"
+      "read-messages",
+      "send-messages"
     ],
     "requires": [],
     "minimumMurmureVersion": "1.0.0",

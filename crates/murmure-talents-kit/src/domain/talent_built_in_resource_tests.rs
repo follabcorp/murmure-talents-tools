@@ -268,25 +268,26 @@ fn the_notes_capabilities_have_four_suppliers_among_the_built_in_talents_and_the
 }
 
 #[test]
-fn my_messages_drives_the_messages_connector_on_macos_and_only_reads_conversations() {
+fn my_messages_drives_the_messages_connector_on_macos_reads_conversations_and_sends_messages() {
     use super::{TalentCapability, TalentNeed};
     let resource = built_in("mes-messages");
     assert_eq!(resource.connector, "messages");
     let manifest = resource.manifest;
     assert_eq!(manifest.kind, TalentKind::WithCode);
-    assert_eq!(manifest.capabilities, [TalentCapability::ReadMessages]);
+    assert_eq!(manifest.capabilities, [TalentCapability::ReadMessages, TalentCapability::SendMessages]);
     assert_eq!(manifest.needs, [TalentNeed::Organizing]);
     assert!(manifest.requires.is_empty());
     assert_eq!(manifest.platforms, Some(vec![super::TalentPlatform::Macos]));
-    assert_eq!(manifest.version.to_string(), "1.0.0");
+    assert_eq!(manifest.version.to_string(), "1.1.0", "like « Mes mails » when it learned to send");
+    assert_eq!(manifest.minimum_murmure_version.to_string(), "1.0.0");
     assert_eq!(manifest.localized["fr"].name, "Mes messages");
     assert_eq!(manifest.localized["en"].name, "My messages");
     assert_eq!((manifest.author.name.as_str(), manifest.license.as_str()), ("Murmure", "MIT"));
 }
 
-/// Only « Telegram », « Slack » and « Discord » send messages; they also read them, next to « Mes messages ».
+/// Only « Mes messages », « Telegram », « Slack » and « Discord » send messages.
 #[test]
-fn only_the_three_chat_talents_declare_the_send_messages_capability() {
+fn only_the_four_message_talents_declare_the_send_messages_capability() {
     use super::TalentCapability;
     let senders: Vec<String> = BUILT_IN_MANIFESTS
         .iter()
@@ -296,7 +297,7 @@ fn only_the_three_chat_talents_declare_the_send_messages_capability() {
         .collect();
     let mut senders = senders;
     senders.sort();
-    assert_eq!(senders, ["discord", "slack", "telegram"]);
+    assert_eq!(senders, ["discord", "mes-messages", "slack", "telegram"]);
 }
 
 /// « Telegram »: the Connector `telegram`, macOS and Linux, need `organizing`, the two messages capabilities (no new one).
@@ -322,7 +323,7 @@ fn telegram_drives_the_telegram_connector_on_macos_and_linux_with_the_messages_c
         .collect();
     let suppliers = TalentDependencyRule::suppliers(&manifests);
     assert_eq!(suppliers[&TalentCapability::ReadMessages], ["discord", "mes-messages", "slack", "telegram"]);
-    assert_eq!(suppliers[&TalentCapability::SendMessages], ["discord", "slack", "telegram"]);
+    assert_eq!(suppliers[&TalentCapability::SendMessages], ["discord", "mes-messages", "slack", "telegram"]);
 }
 
 /// The three task Talents: one Connector each, the same two capabilities, the same need, macOS and Linux.
